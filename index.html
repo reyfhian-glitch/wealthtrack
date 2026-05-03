@@ -2,9 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="WealthTrack">
 <meta name="theme-color" content="#080810">
 <link rel="manifest" href="manifest.json">
@@ -28,54 +28,58 @@
   --font-d:'Playfair Display',Georgia,serif;--font-b:'Outfit',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text0);font-family:var(--font-b);font-size:14px;line-height:1.5}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text0);font-family:var(--font-b);font-size:14px;line-height:1.5;touch-action:pan-x pan-y}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px}
 button{font-family:var(--font-b);cursor:pointer}input,select,textarea{font-family:var(--font-b)}
 
 /* APP */
-#app{display:flex;height:100vh;overflow:hidden}
+#app{display:flex;height:100vh;overflow:hidden;position:relative}
 
-/* SIDEBAR */
+/* SIDEBAR OVERLAY */
+#sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+#sb-overlay.show{opacity:1;pointer-events:all}
 #sidebar{
-  width:var(--sidebar-col);background:var(--bg1);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;align-items:center;padding:16px 0;
-  flex-shrink:0;z-index:100;overflow:hidden;
-  transition:width .3s cubic-bezier(.4,0,.2,1);
+  position:fixed;left:0;top:0;bottom:0;width:270px;
+  background:var(--bg1);border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;padding:0;
+  z-index:300;overflow:hidden;
+  transform:translateX(-100%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
 }
-#sidebar.exp{width:var(--sidebar-full);align-items:flex-start}
-.sb-logo-wrap{display:flex;align-items:center;gap:10px;padding:0 15px;width:100%;margin-bottom:6px}
-.sb-logo{width:36px;height:36px;background:var(--gold-a20);border:1px solid var(--gold-a20);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;cursor:pointer;transition:background .2s}
-.sb-logo:hover{background:var(--gold-a20)}
-.sb-brand{font-family:var(--font-d);font-size:14px;font-weight:700;color:var(--gold1);white-space:nowrap;display:none}
-#sidebar.exp .sb-brand{display:block}
-.sb-div{width:36px;height:1px;background:var(--border);margin:8px auto}
-#sidebar.exp .sb-div{width:calc(100% - 30px);margin:8px 15px}
-.nav-sec{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:8px 15px 3px;white-space:nowrap;display:none}
-#sidebar.exp .nav-sec{display:block}
-.ni{width:100%;display:flex;align-items:center;gap:10px;padding:9px 15px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;text-align:left;white-space:nowrap;transition:color .15s,background .15s;position:relative}
+#sidebar.exp{transform:translateX(0)}
+.sb-logo-wrap{display:flex;align-items:center;gap:12px;padding:20px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-logo{width:36px;height:36px;background:var(--gold-a20);border:1px solid var(--gold-a20);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-brand{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--gold1);white-space:nowrap;flex:1}
+.sb-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:4px;line-height:1}
+.sb-close:hover{color:var(--text0)}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 0}
+.sb-div{width:calc(100% - 32px);height:1px;background:var(--border);margin:8px 16px}
+.nav-sec{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:10px 16px 3px}
+.ni{width:100%;display:flex;align-items:center;gap:12px;padding:11px 16px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;text-align:left;white-space:nowrap;transition:color .15s,background .15s;position:relative}
 .ni:hover{background:var(--bg3);color:var(--text1)}
 .ni.act{color:var(--gold1);background:var(--gold-a12)}
 .ni.act::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 3px 3px 0}
-.ni-ic{font-size:17px;width:22px;text-align:center;flex-shrink:0}
-.ni-lbl{display:none}
-#sidebar.exp .ni-lbl{display:block}
-.sb-bot{margin-top:auto;padding:0 15px;width:100%}
-.sb-nw-box{background:var(--gold-a12);border:1px solid var(--gold-a20);border-radius:var(--r-sm);padding:10px 12px;display:none}
-#sidebar.exp .sb-nw-box{display:block}
+.ni-ic{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.ni-lbl{display:block}
+.sb-bot{padding:16px;border-top:1px solid var(--border)}
+.sb-nw-box{background:var(--gold-a12);border:1px solid var(--gold-a20);border-radius:var(--r-sm);padding:12px 14px}
 .sbnw-lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
-.sbnw-val{font-family:var(--font-d);font-size:16px;font-weight:700;color:var(--gold1);margin-top:2px}
+.sbnw-val{font-family:var(--font-d);font-size:18px;font-weight:700;color:var(--gold1);margin-top:2px}
 .sbnw-ph{font-size:10px;color:var(--text2);margin-top:2px}
 
 /* MAIN */
-#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#topbar{height:54px;background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 18px;flex-shrink:0}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;width:100%}
+#topbar{height:calc(54px + env(safe-area-inset-top));background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:flex-end;gap:12px;padding:0 18px 12px;padding-top:calc(12px + env(safe-area-inset-top));flex-shrink:0}
 #pg-title{font-family:var(--font-d);font-size:16px;font-weight:700;color:var(--text0);flex:1}
 .t-date{font-size:11px;color:var(--text2);background:var(--bg3);padding:4px 10px;border-radius:99px}
 .t-btn{background:var(--gold-a12);border:1px solid var(--gold-a20);border-radius:var(--r-sm);padding:6px 14px;color:var(--gold1);font-size:12px;font-weight:600;transition:all .2s}
 .t-btn:hover{background:var(--gold-a20)}
+.hbg{background:var(--gold-a12);border:1px solid var(--gold-a20);border-radius:var(--r-sm);width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.hbg:hover{background:var(--gold-a20)}
+.hbg-ic{font-size:17px;line-height:1}
 
 #content{flex:1;overflow-y:auto}
-.page{display:none;padding:18px;padding-bottom:48px;animation:fu .22s ease}
+.page{display:none;padding:18px;padding-bottom:calc(48px + env(safe-area-inset-bottom));animation:fu .22s ease}
 .page.act{display:block}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
@@ -235,29 +239,32 @@ textarea.fi{resize:vertical;min-height:80px}
 <div id="app">
 
 <!-- SIDEBAR -->
+<div id="sb-overlay" onclick="closeSB()"></div>
 <nav id="sidebar">
   <div class="sb-logo-wrap">
-    <div class="sb-logo" onclick="toggleSB()">⚡</div>
+    <div class="sb-logo">⚡</div>
     <span class="sb-brand">WealthTrack</span>
+    <button class="sb-close" onclick="closeSB()">✕</button>
   </div>
-  <div class="sb-div"></div>
-  <div class="nav-sec">Utama</div>
-  <button class="ni act" onclick="go('dashboard')"><span class="ni-ic">📊</span><span class="ni-lbl">Dashboard</span></button>
-  <button class="ni" onclick="go('cashflow')"><span class="ni-ic">💸</span><span class="ni-lbl">Catat Transaksi</span></button>
-  <div class="sb-div"></div>
-  <div class="nav-sec">Keuangan</div>
-  <button class="ni" onclick="go('tabungan')"><span class="ni-ic">🏦</span><span class="ni-lbl">Tabungan</span></button>
-  <button class="ni" onclick="go('aset')"><span class="ni-ic">📈</span><span class="ni-lbl">Aset & Investasi</span></button>
-  <button class="ni" onclick="go('transaksi')"><span class="ni-ic">🧾</span><span class="ni-lbl">Riwayat Transaksi</span></button>
-  <div class="sb-div"></div>
-  <div class="nav-sec">Progres</div>
-  <button class="ni" onclick="go('journey')"><span class="ni-ic">🗺️</span><span class="ni-lbl">Perjalanan 1T</span></button>
-  <button class="ni" onclick="go('target')"><span class="ni-ic">🎯</span><span class="ni-lbl">Target</span></button>
-  <button class="ni" onclick="go('analitik')"><span class="ni-ic">📉</span><span class="ni-lbl">Analitik</span></button>
-  <button class="ni" onclick="go('catatan')"><span class="ni-ic">📝</span><span class="ni-lbl">Catatan</span></button>
-  <div class="sb-div"></div>
-  <div class="nav-sec">Sistem</div>
-  <button class="ni" onclick="go('pengaturan')"><span class="ni-ic">⚙️</span><span class="ni-lbl">Pengaturan</span></button>
+  <div class="sb-nav">
+    <div class="nav-sec">Utama</div>
+    <button class="ni act" onclick="go('dashboard')"><span class="ni-ic">📊</span><span class="ni-lbl">Dashboard</span></button>
+    <button class="ni" onclick="go('cashflow')"><span class="ni-ic">💸</span><span class="ni-lbl">Catat Transaksi</span></button>
+    <div class="sb-div"></div>
+    <div class="nav-sec">Keuangan</div>
+    <button class="ni" onclick="go('tabungan')"><span class="ni-ic">🏦</span><span class="ni-lbl">Tabungan</span></button>
+    <button class="ni" onclick="go('aset')"><span class="ni-ic">📈</span><span class="ni-lbl">Aset & Investasi</span></button>
+    <button class="ni" onclick="go('transaksi')"><span class="ni-ic">🧾</span><span class="ni-lbl">Riwayat Transaksi</span></button>
+    <div class="sb-div"></div>
+    <div class="nav-sec">Progres</div>
+    <button class="ni" onclick="go('journey')"><span class="ni-ic">🗺️</span><span class="ni-lbl">Perjalanan 1T</span></button>
+    <button class="ni" onclick="go('target')"><span class="ni-ic">🎯</span><span class="ni-lbl">Target</span></button>
+    <button class="ni" onclick="go('analitik')"><span class="ni-ic">📉</span><span class="ni-lbl">Analitik</span></button>
+    <button class="ni" onclick="go('catatan')"><span class="ni-ic">📝</span><span class="ni-lbl">Catatan</span></button>
+    <div class="sb-div"></div>
+    <div class="nav-sec">Sistem</div>
+    <button class="ni" onclick="go('pengaturan')"><span class="ni-ic">⚙️</span><span class="ni-lbl">Pengaturan</span></button>
+  </div>
   <div class="sb-bot">
     <div class="sb-nw-box">
       <div class="sbnw-lbl">Net Worth</div>
@@ -270,6 +277,9 @@ textarea.fi{resize:vertical;min-height:80px}
 <!-- MAIN -->
 <div id="main">
   <div id="topbar">
+    <button class="hbg" onclick="toggleSB()">
+      <span class="hbg-ic">⚡</span>
+    </button>
     <div id="pg-title">Dashboard</div>
     <div class="t-date" id="t-date"></div>
     <button class="t-btn" onclick="go('cashflow')">+ Catat</button>
@@ -528,7 +538,7 @@ function go(page){
   document.querySelectorAll('.ni').forEach(b=>b.classList.remove('act'));
   document.querySelectorAll('.ni').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+page+"'"))b.classList.add('act')});
   document.getElementById('pg-title').textContent=pgTtl[page]||page;
-  curPage=page; cSBm(); render(page);
+  curPage=page; closeSB(); render(page);
 }
 function render(p){
   if(p==='dashboard')rDash();
@@ -543,11 +553,18 @@ function render(p){
   if(p==='pengaturan')rSet();
 }
 
-// SIDEBAR
-function toggleSB(){document.getElementById('sidebar').classList.toggle('exp')}
-function cSBm(){if(window.innerWidth<900)document.getElementById('sidebar').classList.remove('exp')}
-window.addEventListener('resize',()=>{if(window.innerWidth>=900)document.getElementById('sidebar').classList.add('exp');else document.getElementById('sidebar').classList.remove('exp')});
-if(window.innerWidth>=900)document.getElementById('sidebar').classList.add('exp');
+// SIDEBAR — overlay drawer, always hidden by default on all sizes
+function toggleSB(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sb-overlay');
+  const open=sb.classList.contains('exp');
+  if(open){closeSB();}else{sb.classList.add('exp');ov.classList.add('show');document.body.style.overflow='hidden';}
+}
+function closeSB(){
+  document.getElementById('sidebar').classList.remove('exp');
+  document.getElementById('sb-overlay').classList.remove('show');
+  document.body.style.overflow='';
+}
 
 // CHARTS
 const CR={};
@@ -752,6 +769,12 @@ function init(){
   document.getElementById('t-date').textContent=new Date().toLocaleDateString('id',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
   fillCats();updSB();rDash();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  // Prevent double-tap zoom
+  let lastTap=0;
+  document.addEventListener('touchend',function(e){const now=Date.now();if(now-lastTap<300){e.preventDefault();}lastTap=now;},{passive:false});
+  // Prevent pinch/gesture zoom
+  document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
+  document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});
 }
 init();
 </script>
